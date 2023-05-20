@@ -2,11 +2,9 @@
 파일들의 이름을 Unicode NFC로 정규화해주는 프로그램입니다.
 
 # 설치
-1. https://rustup.rs 에서 Rust와 Cargo를 설치합니다.
-2. 쉘을 재시작합니다 (`exec $SHELL` 혹은 터미널 종료 후 재시작).
-3. `cargo install --git https://github.com/cr0sh/jaso.git`
-
-업데이트는 `cargo install -f --git https://github.com/cr0sh/jaso.git` 으로 할 수 있습니다.
+```bash
+brew install simnalamburt/x/jaso
+```
 
 # 사용법
 
