@@ -1,12 +1,9 @@
 use std::borrow::Cow;
 use std::fs::rename;
 use std::path::{Component, Path, PathBuf};
-use std::thread;
 use std::time::Instant;
 
 use clap::Parser;
-use crossbeam_channel::unbounded;
-use rlimit::Resource;
 use walkdir::WalkDir;
 
 #[derive(Parser)]
@@ -26,24 +23,17 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    // Automatically increase NOFILE rlimit to the allowed maximum
-    if let Err(e) = rlimit::increase_nofile_limit(u64::MAX) {
-        eprintln!("warning: failed to increase NOFILE rlimit ({e})");
-    }
-
-    let nofile = rlimit::getrlimit(Resource::NOFILE).expect("cannot query rlimit");
-    if nofile.0 < 1024 || nofile.1 < 1024 {
-        eprintln!("warning: NOFILE resource limit is low(={nofile:?}), run `ulimit -n 65536` and try again if panic occurs");
-    }
-
     let start = Instant::now();
 
-    let (tx, rx) = unbounded::<PathBuf>();
-
-    let thread_join_handle = thread::spawn(move || {
-        let mut success = 0usize;
-        let mut error = 0usize;
-        while let Ok(path) = rx.recv() {
+    let mut success = 0usize;
+    let mut error = 0usize;
+    for p in args.paths {
+        for entry in WalkDir::new(p).follow_links(args.follow_symlinks) {
+            let Ok(entry) = entry else {
+                eprintln!("skip: {}", entry.unwrap_err());
+                continue;
+            };
+            let path = entry.into_path();
             let mut it = path.components();
             let Some(Component::Normal(oldname)) = it.next_back() else { continue }; // skip '..' or '/'
             let Some(oldname) = oldname.to_str() else { continue }; // skip non-unicode filename
@@ -53,8 +43,8 @@ fn main() {
             let Some(dirname) = dirname.to_str() else { continue }; // skip non-unicode dirname
 
             // NOTE: Actual dirname will be already NFC at this point but this thread can still see
-            // NFD dirname. This is because directory traversal and renaming are done in separate
-            // threads. So we should NFC-normalize the dirname to avoid TOCTOU.
+            // NFD dirname. This is because renaming doesn't actually affect already fetched inode
+            // in userland memory. So we should NFC-normalize the dirname to avoid TOCTOU.
             let dirname = normalize_into_nfc(dirname); // maybe alloc
             let dirname = Path::new(&*dirname);
 
@@ -76,23 +66,7 @@ fn main() {
                 eprintln!("success: {old:?} -> {new:?}");
             }
         }
-        (success, error)
-    });
-
-    for p in args.paths {
-        for entry in WalkDir::new(p).follow_links(args.follow_symlinks) {
-            let Ok(entry) = entry else {
-                eprintln!("skip: {}", entry.unwrap_err());
-                continue;
-            };
-            let path = entry.into_path();
-            tx.send(path).unwrap(); // never fails
-        }
     }
-    drop(tx);
-    let (success, error) = thread_join_handle
-        .join()
-        .expect("thread panicked unexpectedly");
 
     let elapsed = start.elapsed();
     if args.dry_run {
