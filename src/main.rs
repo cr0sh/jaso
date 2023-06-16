@@ -26,10 +26,13 @@ struct Args {
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
-    let nofile = rlimit::getrlimit(Resource::NOFILE).expect("cannot query rlimit");
 
+    // Automatically increase NOFILE rlimit to the allowed maximum
+    rlimit::increase_nofile_limit(u64::MAX).expect("failed during increasing NOFILE rlimit");
+
+    let nofile = rlimit::getrlimit(Resource::NOFILE).expect("cannot query rlimit");
     if nofile.0 < 1024 || nofile.1 < 1024 {
-        eprintln!("warning: NOFILE resource limit is low(={nofile:?}), run ulimit -n 65536 and try again if panic occurs");
+        eprintln!("warning: NOFILE resource limit is low(={nofile:?}), run `ulimit -n 65536` and try again if panic occurs");
     }
 
     if args.follow_directory_symlinks {
