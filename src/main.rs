@@ -10,7 +10,7 @@ const CONCURRENT_TASKS: usize = 32768;
 static SEMA: Semaphore = Semaphore::const_new(CONCURRENT_TASKS);
 
 #[derive(Parser, Debug)]
-#[clap(rename_all = "kebab-case")]
+#[clap(version, rename_all = "kebab-case", arg_required_else_help = true)]
 struct Args {
     #[arg(long)]
     follow_directory_symlinks: bool,
