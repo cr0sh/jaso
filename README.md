@@ -18,16 +18,14 @@ Arguments:
   <PATHS>...  Files to perform jaso merges
 
 Options:
-  -r, --recursive
       --follow-directory-symlinks
   -v, --verbose
       --dry-run
   -h, --help                       Print help
 ```
 
-현재 위치한 디렉토리를 정규화하고 싶으면 `jaso -rv .` 을 하시면 됩니다.
+현재 위치한 디렉토리를 정규화하고 싶으면 `jaso .` 을 하시면 됩니다.
 
-- `-r`: 파일 탐색 중 디렉토리를 만나면 안쪽 파일과 그 안쪽... 까지 모두 정규화를 수행합니다.
 - `-v`: 정규화에 시간이 얼마나 걸렸는지와 같은 정보를 추가로 표시합니다.
 - `--dry-run`: 파일명을 실제로 바꾸지 않고 어떻게 바꿀 것인지 표시만 수행합니다.
 - `--follow-directory-symlinks`: 디렉토리 심링크를 따라갑니다.

@@ -12,8 +12,6 @@ static SEMA: Semaphore = Semaphore::const_new(CONCURRENT_TASKS);
 #[derive(Parser, Debug)]
 #[clap(rename_all = "kebab-case")]
 struct Args {
-    #[arg(short, long)]
-    recursive: bool,
     #[arg(long)]
     follow_directory_symlinks: bool,
     #[arg(short, long)]
@@ -34,8 +32,8 @@ async fn main() {
         eprintln!("warning: NOFILE resource limit is low(={nofile:?}), run ulimit -n 65536 and try again if panic occurs");
     }
 
-    if args.follow_directory_symlinks && args.recursive {
-        eprintln!("warning: --recursive and --follow_directory_symlinks is both ON; be aware for infinite recursion!");
+    if args.follow_directory_symlinks {
+        eprintln!("warning: --follow_directory_symlinks is ON; be aware for infinite recursion!");
     }
 
     let start = Instant::now();
