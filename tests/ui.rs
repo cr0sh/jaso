@@ -1,5 +1,5 @@
 use std::os::unix::prelude::*;
-use std::{fs, io::ErrorKind, process::Command};
+use std::{fs, process::Command};
 
 const DECOMPOSED: &str = "\u{110b}\u{1161}\u{11ab}\u{1102}\u{1167}\u{11bc}\u{1112}\u{1161}\u{1109}\u{1166}\u{110b}\u{116d}";
 const COMPOSED: &str = "안녕하세요";

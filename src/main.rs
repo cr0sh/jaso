@@ -10,10 +10,8 @@ const CONCURRENT_TASKS: usize = 32768;
 static SEMA: Semaphore = Semaphore::const_new(CONCURRENT_TASKS);
 
 #[derive(Parser, Debug)]
-#[clap(rename_all = "kebab-case")]
+#[clap(version, arg_required_else_help = true)]
 struct Args {
-    #[arg(short, long)]
-    recursive: bool,
     #[arg(long)]
     follow_directory_symlinks: bool,
     #[arg(short, long)]
@@ -28,14 +26,17 @@ struct Args {
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
-    let nofile = rlimit::getrlimit(Resource::NOFILE).expect("cannot query rlimit");
 
+    // Automatically increase NOFILE rlimit to the allowed maximum
+    rlimit::increase_nofile_limit(u64::MAX).expect("failed during increasing NOFILE rlimit");
+
+    let nofile = rlimit::getrlimit(Resource::NOFILE).expect("cannot query rlimit");
     if nofile.0 < 1024 || nofile.1 < 1024 {
-        eprintln!("warning: NOFILE resource limit is low(={nofile:?}), run ulimit -n 65536 and try again if panic occurs");
+        eprintln!("warning: NOFILE resource limit is low(={nofile:?}), run `ulimit -n 65536` and try again if panic occurs");
     }
 
-    if args.follow_directory_symlinks && args.recursive {
-        eprintln!("warning: --recursive and --follow_directory_symlinks is both ON; be aware for infinite recursion!");
+    if args.follow_directory_symlinks {
+        eprintln!("warning: --follow_directory_symlinks is ON; be aware for infinite recursion!");
     }
 
     let start = Instant::now();
