@@ -2,6 +2,8 @@
 name = "jaso"
 version = "0.2.0"
 edition = "2021"
+description = "Normalizes filenames into Unicode NFC form."
+license = "Unlicense"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
