@@ -20,8 +20,9 @@ Arguments:
 Options:
       --follow-directory-symlinks
   -v, --verbose
-      --dry-run
-  -h, --help                       Print help
+  -n, --dry-run
+  -h, --help                       Print help information
+  -V, --version                    Print version information
 ```
 
 현재 위치한 디렉토리를 정규화하고 싶으면 `jaso .` 을 하시면 됩니다.
