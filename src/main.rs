@@ -16,7 +16,7 @@ struct Args {
     follow_directory_symlinks: bool,
     #[arg(short, long)]
     verbose: bool,
-    #[arg(long)]
+    #[arg(short = 'n', long)]
     dry_run: bool,
     /// Files to perform jaso merges
     #[arg(required = true)]
