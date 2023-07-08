@@ -1,9 +1,17 @@
 [package]
 name = "jaso"
 version = "0.2.0"
+authors = ["Junghyun Nam <hyun@cro.sh>", "Hyeon Kim <simnalamburt@gmail.com>"]
 edition = "2021"
-description = "Normalizes filenames into Unicode NFC form."
+description = """
+jaso normalizes filenames to their Unicode NFC format in parallel, and is much
+faster than convmv(1).
+"""
+repository = "https://github.com/cr0sh/jaso"
+homepage = "https://github.com/cr0sh/jaso"
 license = "Apache-2.0 OR MIT"
+keywords = ["cli", "convmv", "unicode", "nfc", "nfd"]
+categories = ["command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
