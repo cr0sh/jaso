@@ -1,6 +1,6 @@
 [package]
 name = "jaso"
-version = "0.2.0"
+version = "1.0.0"
 authors = ["Junghyun Nam <hyun@cro.sh>", "Hyeon Kim <simnalamburt@gmail.com>"]
 edition = "2021"
 description = """
