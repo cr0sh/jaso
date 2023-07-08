@@ -9,16 +9,33 @@ use unicode_normalization::{is_nfc, UnicodeNormalization};
 const CONCURRENT_TASKS: usize = 32768;
 static SEMA: Semaphore = Semaphore::const_new(CONCURRENT_TASKS);
 
+/// jaso normalizes filenames to their Unicode NFC format in parallel
 #[derive(Parser, Debug)]
 #[clap(version, arg_required_else_help = true)]
 struct Args {
+    /// Follows symbolic links to directories.
+    ///
+    /// Note that current implementation of jaso allows infinite recursion due to cyclic symbolic
+    /// links.
     #[arg(long)]
     follow_directory_symlinks: bool,
+    /// Shows additional information, such as what files has been renamed.
+    ///
+    /// This option is useful for debugging or logging.
     #[arg(short, long)]
     verbose: bool,
+    /// Just indicates what would be renamed, without actually renaming files.
+    ///
+    /// This option is useful for checking if normalization is needed. This option implies
+    /// the `--verbose` option.
+    ///
+    /// Note that it is possible that dry-run succeeds but actual run fails.
     #[arg(short = 'n', long)]
     dry_run: bool,
-    /// Files to perform jaso merges
+    /// Paths to normalize recursively.
+    ///
+    /// If a directory is given, all files in the directory will be normalized.
+    /// If a symbolic link is given, the link itself will be normalized too.
     #[arg(required = true)]
     paths: Vec<PathBuf>,
 }
