@@ -10,7 +10,7 @@ faster than convmv(1).
 repository = "https://github.com/cr0sh/jaso"
 homepage = "https://github.com/cr0sh/jaso"
 license = "Apache-2.0 OR MIT"
-keywords = ["cli", "convmv", "unicode", "nfc", "nfd"]
+keywords = ["cli", "convmv", "unicode", "nfc", "hangul"]
 categories = ["command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

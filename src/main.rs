@@ -27,7 +27,7 @@ struct Args {
     /// Just indicates what would be renamed, without actually renaming files.
     ///
     /// This option is useful for checking if normalization is needed. This option implies
-    /// `--verbose` option.
+    /// the `--verbose` option.
     ///
     /// Note that it is possible that dry-run succeeds but actual run fails.
     #[arg(short = 'n', long)]
