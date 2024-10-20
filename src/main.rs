@@ -1,7 +1,8 @@
 use std::path::PathBuf;
 
 use async_recursion::async_recursion;
-use clap::Parser;
+use clap::{builder::ValueHint, CommandFactory, Parser, Subcommand};
+use clap_complete::{generate, Shell};
 use rlimit::Resource;
 use tokio::{sync::Semaphore, time::Instant};
 use unicode_normalization::{is_nfc, UnicodeNormalization};
@@ -11,7 +12,11 @@ static SEMA: Semaphore = Semaphore::const_new(CONCURRENT_TASKS);
 
 /// jaso normalizes filenames to their Unicode NFC format in parallel
 #[derive(Parser, Debug)]
-#[clap(version, arg_required_else_help = true)]
+#[clap(
+    version,
+    arg_required_else_help = true,
+    args_conflicts_with_subcommands = true
+)]
 struct Args {
     /// Follows symbolic links to directories.
     ///
@@ -36,13 +41,35 @@ struct Args {
     ///
     /// If a directory is given, all files in the directory will be normalized.
     /// If a symbolic link is given, the link itself will be normalized too.
-    #[arg(required = true)]
+    #[arg(required = true, value_hint = ValueHint::AnyPath)]
     paths: Vec<PathBuf>,
+
+    /// Subcommands
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
+
+#[derive(Subcommand, Debug)]
+enum Commands {
+    /// Generate shell completion script for specified shell
+    #[command(arg_required_else_help = true)]
+    Completion {
+        #[arg(value_enum)]
+        shell: Shell,
+    },
 }
 
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
+
+    // Handle shell completion
+    if let Some(Commands::Completion { shell }) = args.command {
+        let mut cmd = Args::command();
+        let bin_name = env!("CARGO_PKG_NAME");
+        generate(shell, &mut cmd, bin_name, &mut std::io::stdout());
+        return;
+    }
 
     // Automatically increase NOFILE rlimit to the allowed maximum
     rlimit::increase_nofile_limit(u64::MAX).expect("failed during increasing NOFILE rlimit");
